@@ -1,6 +1,9 @@
 # Back-End-Social-Network-App
 
-Steps to run this project:
+### Node Version
+Use latest node v12
+
+### Steps to run this project:
 
 1. Run `npm i` command
 2. Setup database settings inside `ormconfig.js` file

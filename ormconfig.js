@@ -1,10 +1,7 @@
-{
+console.log(process.env.DATABASE_URL, 'llllldklajdklfjskl')
+module.exports = {
    "type": "postgres",
-   "host": "localhost",
-   "port": 5432,
-   "username": "postgres",
-   "password": "postgres",
-   "database": "test_db",
+   "url": process.env.DATABASE_URL, 
    "synchronize": true,
    "logging": true,
    "entities": [

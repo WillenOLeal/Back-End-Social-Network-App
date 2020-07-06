@@ -1,8 +1,12 @@
 import {Resolver, Mutation, Query, Arg, FieldResolver, Root, InputType, Field, UseMiddleware, Ctx} from'type-graphql'; 
+import {GraphQLUpload, FileUpload} from 'graphql-upload'; 
 import {Post} from '../entity/Post'; 
 import {PostInput, PostUpdateInput} from './types/InputTypes'; 
 import {isAuth} from './middlewares/isAuth'; 
 import { MyContext } from './types/MyContext';
+import {uploadResponse} from './types/OutputTypes'
+import { createWriteStream } from 'fs';
+import {v4 as uuidv4} from 'uuid'; 
 
 @Resolver(Post)
 export class PostResolver {
@@ -15,6 +19,28 @@ export class PostResolver {
     @FieldResolver()
     updatedAt(@Root() post: Post) {
         return post.createdAt.toISOString(); 
+    }
+
+
+    @Mutation(() => uploadResponse)
+    async postImageUpload(@Arg("file", () => GraphQLUpload)
+    {
+      createReadStream,
+      filename
+    }: FileUpload): Promise<uploadResponse> {
+      const fileUniqueName = `${uuidv4()}_${filename}`
+      return new Promise(async (resolve, reject) =>
+        createReadStream()
+          .pipe(createWriteStream(__dirname + `/../images/posts/${fileUniqueName}`))
+          .on("finish", () => resolve({
+              imgName: fileUniqueName,
+              uploaded: true
+          }))
+          .on("error", (err) => reject({
+             imgName: "",
+             uploaded: false
+          }))
+      );
     }
 
    @Mutation(() => Post)
@@ -76,5 +102,6 @@ export class PostResolver {
         const posts = await Post.find()
         return posts; 
    }
-
 }
+
+

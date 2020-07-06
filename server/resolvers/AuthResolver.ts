@@ -5,12 +5,7 @@ import {UserInput} from './types/InputTypes';
 import {UserInputError, AuthenticationError} from 'apollo-server-express';
 import {MyContext} from './types/MyContext'; 
 import {getAuthToken, getRefToken} from './utils/auth'; 
-
-@ObjectType()
-class loginResponse {
-    @Field(() => String)
-    authToken: string
-}
+import {loginResponse} from './types/OutputTypes'
 
 @Resolver(User)
 export class AuthResolver {

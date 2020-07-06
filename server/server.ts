@@ -3,7 +3,6 @@ import {createConnection} from "typeorm";
 import * as express from "express"; 
 import {ApolloServer} from "apollo-server-express"
 import {buildSchema} from 'type-graphql'
-import {HelloWorldResolver} from './resolvers/HelloWorldTesolver'
 import { AuthResolver } from "./resolvers/AuthResolver";
 import {PostResolver}from './resolvers/PostResolver'; 
 import * as dotenv from 'dotenv'
@@ -16,7 +15,7 @@ dotenv.config();
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [HelloWorldResolver, AuthResolver, PostResolver]
+            resolvers: [AuthResolver, PostResolver]
         }),
         context: ({req, res}) => ({req, res}),
     }); 
@@ -25,7 +24,7 @@ dotenv.config();
         app, cors: false
     })
 
-    app.listen(5000, () => {
-        console.log("Listening on port 5000"); 
+    app.listen(3000, () => {
+        console.log("Listening on port 3000"); 
     })
 })();

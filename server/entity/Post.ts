@@ -20,7 +20,7 @@ export class Post extends BaseEntity {
 
     @Field()
     @Column()
-    imgUrl: string; 
+    imgName: string; 
 
     @Field(() => Int)
     @Column()

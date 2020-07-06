@@ -25,7 +25,7 @@ export class PostInput {
     text: string;
 
     @Field()
-    imgUrl: string; 
+    imgName: string; 
 }
 
 
@@ -39,5 +39,5 @@ export class PostUpdateInput {
     text?: string;
 
     @Field({nullable: true})
-    imgUrl?: string; 
+    imgName?: string; 
 }

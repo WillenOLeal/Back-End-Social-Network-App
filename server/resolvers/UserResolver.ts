@@ -39,7 +39,7 @@ export class UserResolver {
       const fileUniqueName = `${uuidv4()}_${filename}`
       return new Promise(async (resolve, reject) =>
         createReadStream()
-          .pipe(createWriteStream(__dirname + `/../images/pictures/${fileUniqueName}`))
+          .pipe(createWriteStream(__dirname + `/../images/profiles/${fileUniqueName}`))
           .on("finish", async () => {
                 getProfilePictureAndDelete(profileId)
                 await Profile.update({id: profileId}, {pictureName: fileUniqueName }); 

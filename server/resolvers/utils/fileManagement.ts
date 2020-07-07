@@ -10,7 +10,7 @@ export const deletePostImg =  async (filename: string) => {
 
 export const deleteProfilePicture =  async (filename: string) => {
 
-    unlink(__dirname + `/../../images/pictures/${filename}`, (err) => {
+    unlink(__dirname + `/../../images/profiles/${filename}`, (err) => {
         if(err) return false
         return true
     } )

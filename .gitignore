@@ -4,9 +4,9 @@ node_modules/
 build/
 tmp/
 temp/
-images/pictures/*
+images/profiles/*
 images/posts/*
-!images/pictures/.gitkeep
+!images/profiles/.gitkeep
 !images/posts/.gitkeep
 .env 
 

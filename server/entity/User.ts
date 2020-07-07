@@ -1,6 +1,7 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, BaseEntity} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, JoinColumn,  OneToOne, BaseEntity} from "typeorm";
 import { ObjectType, Field, Int, ID} from "type-graphql";
 import {Post} from './Post'; 
+import {Profile} from './Profile'; 
 
 
 @ObjectType()
@@ -20,6 +21,9 @@ export class User extends BaseEntity{
 
     @OneToMany(type => Post,  post => post.user, {cascade: true})
     posts: Post[];
+
+    @OneToOne(type => Profile, {cascade: true})
+    profile: Profile;
 
     @Field(() => String,{nullable: true})
     @CreateDateColumn({type: "timestamp"})

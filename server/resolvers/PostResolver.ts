@@ -64,7 +64,6 @@ export class PostResolver {
        @Arg('postInput', () => PostInput) postInput: PostInput,
        @Ctx() {payload}: MyContext
    ) {
-       console.log(payload.userId); 
         const post = await Post.create({...postInput, userId: parseInt(payload.userId)}).save();
         return  post; 
    }

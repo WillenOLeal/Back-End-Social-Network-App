@@ -6,6 +6,7 @@ import {UserInputError, AuthenticationError} from 'apollo-server-express';
 import {MyContext} from './types/MyContext'; 
 import {getAuthToken, getRefToken} from './utils/auth'; 
 import {loginResponse} from './types/OutputTypes'
+import {Profile} from '../entity/Profile';
 
 @Resolver(User)
 export class AuthResolver {
@@ -24,6 +25,7 @@ export class AuthResolver {
        if (user) throw new UserInputError('This email is alreay taken'); 
         const hashedPassword = await bcrypt.hash(password, 12); 
         const newUser = await User.create({email: email.toLowerCase(), password: hashedPassword}).save(); 
+        Profile.create({pictureName: "", userId: newUser.id}).save(); 
         return newUser; 
    }
 
@@ -43,17 +45,6 @@ export class AuthResolver {
                 expires: new Date(Date.now() + 600480000)
             }
         );
-        
         return getAuthToken(user);  
    }
-
-   @Mutation(() => Boolean)
-   async deleteUser(
-       @Arg('id') id: number
-   ){
-        const result = await User.delete({id: id}); 
-        if (result.affected > 0) return true; 
-        else return false; 
-   }
-
 }

@@ -7,6 +7,7 @@ import {MyContext} from './types/MyContext';
 import {getAuthToken, getRefToken} from './utils/auth'; 
 import {loginResponse} from './types/OutputTypes'
 import {Profile} from '../entity/Profile';
+import {setRefToken} from './utils/auth'; 
 
 @Resolver(User)
 export class AuthResolver {
@@ -40,11 +41,7 @@ export class AuthResolver {
         const isValid = await bcrypt.compare(password, user.password); 
         if(!isValid) throw new AuthenticationError('Authenctication failed. Invalid credentials'); 
 
-        res.cookie('sif', getRefToken(user) ,{
-                httpOnly: true,
-                expires: new Date(Date.now() + 600480000)
-            }
-        );
+        setRefToken(res, user); 
         return getAuthToken(user);  
    }
 }

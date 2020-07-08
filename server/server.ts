@@ -6,6 +6,7 @@ import {buildSchema} from 'type-graphql'
 import { AuthResolver } from "./resolvers/AuthResolver";
 import {PostResolver}from './resolvers/PostResolver'; 
 import {UserResolver} from './resolvers/UserResolver'
+import {graphqlUploadExpress} from 'graphql-upload'
 import * as dotenv from 'dotenv'
 
 dotenv.config(); 
@@ -19,7 +20,10 @@ dotenv.config();
             resolvers: [AuthResolver, PostResolver, UserResolver]
         }),
         context: ({req, res}) => ({req, res}),
+        uploads: false
     }); 
+
+    app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
 
     apolloServer.applyMiddleware({
         app, cors: false

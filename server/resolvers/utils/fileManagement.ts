@@ -1,17 +1,15 @@
-import {unlink} from 'fs'; 
+import {unlink} from 'fs/promises'; 
 
-export const deletePostImg =  async (filename: string) => {
+export const deletePostImg =  (filename: string) => {
 
-    unlink(__dirname + `/../../images/posts/${filename}`, (err) => {
-        if(err) return false
-        return true
-    } )
+    unlink(__dirname + `/../../images/posts/${filename}`)
+    .then(() => true)
+    .catch(() => false)
 }
 
-export const deleteProfilePicture =  async (filename: string) => {
-
-    unlink(__dirname + `/../../images/profiles/${filename}`, (err) => {
-        if(err) return false
-        return true
-    } )
+export const deleteProfilePicture =  (filename: string) => {
+    
+    unlink(__dirname + `/../../images/profiles/${filename}`)
+    .then(() => true)
+    .catch(() => false)
 }

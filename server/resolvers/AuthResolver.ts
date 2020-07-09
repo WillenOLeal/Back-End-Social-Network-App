@@ -8,6 +8,7 @@ import {getAuthToken, getRefToken} from './utils/auth';
 import {loginResponse} from './types/OutputTypes'
 import {Profile} from '../entity/Profile';
 import {setRefToken} from './utils/auth'; 
+import { getConnection } from 'typeorm';
 
 @Resolver(User)
 export class AuthResolver {
@@ -43,5 +44,14 @@ export class AuthResolver {
 
         setRefToken(res, user); 
         return getAuthToken(user);  
+   }
+
+   @Mutation(() => Boolean)
+   async  revokeRefreshToken(
+       @Arg('userId') userId: number
+   ){
+        const result = await getConnection().getRepository(User).increment({id: userId}, 'tokenVersion', 1); 
+        if(result.affected > 0) return true
+        else return false; 
    }
 }

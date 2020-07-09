@@ -21,8 +21,9 @@ export const getAuthToken = (user: User) => {
 }
 
 export const getRefToken = (user: User) => {
-    return  sign({
-        userId: user.id
+    return sign({
+        userId: user.id,
+        tokenVersion: user.tokenVersion
         },process.env.REF_SECRET, {
             expiresIn: '7d'
     })
@@ -45,6 +46,8 @@ export const refreshToken = async (req: Request, res: Response) => {
     const user = await User.findOne({id: payload.userId})
 
     if(!user)  return res.send({ok: false, AuthToken: ""}) ; 
+
+    if(user.tokenVersion != payload.tokenVersion)  return res.send({ok: false, AuthToken: ""}) ; 
 
     setRefToken(res, user); 
     return res.send({ok: true, authToken: getAuthToken(user).authToken}) ; 

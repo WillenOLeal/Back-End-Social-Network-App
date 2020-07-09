@@ -19,6 +19,9 @@ export class User extends BaseEntity{
     @Column()
     password: string; 
 
+    @Column({default: 0})
+    tokenVersion: number
+
     @OneToMany(type => Post,  post => post.user, {cascade: true})
     posts: Post[];
 

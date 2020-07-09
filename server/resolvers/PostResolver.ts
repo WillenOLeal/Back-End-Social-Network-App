@@ -38,6 +38,7 @@ export class PostResolver {
 
 
     @Mutation(() => uploadResponse)
+    @UseMiddleware(isAuth)
     async postImageUpload(@Arg("file", () => GraphQLUpload)
     {
       createReadStream,

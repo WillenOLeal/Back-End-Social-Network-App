@@ -2,6 +2,7 @@ import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, Joi
 import { ObjectType, Field, Int, ID} from "type-graphql";
 import {Post} from './Post'; 
 import {Profile} from './Profile'; 
+import { Comment } from "./Comment";
 
 
 @ObjectType()
@@ -28,6 +29,9 @@ export class User extends BaseEntity{
 
     @OneToMany(type => Post,  post => post.user, {cascade: true})
     posts: Post[];
+
+    @OneToMany(type => Comment,  Comment => Comment.user, {cascade: true})
+    comments: Comment[];
 
     @OneToOne(type => Profile, {cascade: true})
     profile: Profile;

@@ -1,4 +1,6 @@
-import {ObjectType, Field} from 'type-graphql'; 
+import {ObjectType, Field, ID, Int, FieldResolver, Root} from 'type-graphql'; 
+import { User } from '../../entity/User';
+import { Post } from '../../entity/Post';
 
 @ObjectType()
 export class loginResponse {
@@ -14,4 +16,5 @@ export class uploadResponse {
     @Field(() => Boolean)
     uploaded: boolean
 }
+
 

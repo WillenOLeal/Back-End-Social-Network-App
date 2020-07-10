@@ -4,6 +4,13 @@ import {Field, InputType} from'type-graphql';
 
 @InputType()
 export class UserInput {
+
+    @Field()
+    @MinLength(4, {
+        message: "The username is too short"
+    })
+    username: string; 
+
     @Field()
     @IsEmail()
     email: string;

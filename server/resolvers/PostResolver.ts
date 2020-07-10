@@ -117,7 +117,8 @@ export class PostResolver {
 
    @Query(() => [Post])
    async getAllPosts(){
-        const posts = await Post.find()
+        const posts = await Post.find({ relations: ['user'] })
+        console.log(posts)
         return posts; 
    }
 }

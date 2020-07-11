@@ -20,6 +20,7 @@ export class Comment extends BaseEntity{
     @Column()
     userId?: number; 
 
+    @Field(() => User)
     @ManyToOne(type => User, user => user.comments, { onDelete: 'CASCADE' })
     user?:  User
 
@@ -33,4 +34,5 @@ export class Comment extends BaseEntity{
     @Field(() => String, {nullable: true})
     @CreateDateColumn({type: "timestamp"})
     createdAt?: Date; 
+
 }

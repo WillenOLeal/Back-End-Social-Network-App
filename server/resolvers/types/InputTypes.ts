@@ -1,5 +1,5 @@
 import { IsEmail, MinLength} from 'class-validator';
-import {Field, InputType} from'type-graphql'; 
+import {Field, InputType, Int} from'type-graphql'; 
 
 
 @InputType()
@@ -36,7 +36,6 @@ export class PostInput {
 }
 
 
-
 @InputType()
 export class PostUpdateInput {
     @Field({nullable: true})
@@ -47,4 +46,13 @@ export class PostUpdateInput {
 
     @Field({nullable: true})
     imgName?: string; 
+}
+
+@InputType()
+export class PaginationInput {
+    @Field(() => Int)
+    page: number;
+
+    @Field(() => Int)
+    limit: number
 }

@@ -36,7 +36,6 @@ export class PostResolver {
         return post.createdAt.toISOString(); 
     }
 
-
     @Mutation(() => uploadResponse)
     @UseMiddleware(isAuth)
     async postImageUpload(@Arg("file", () => GraphQLUpload)
@@ -111,7 +110,10 @@ export class PostResolver {
    async getPosts(
     @Ctx() {payload}: MyContext
    ){
-        const posts = await Post.find({userId: parseInt(payload.userId)})
+        const posts = await Post.find({
+            relations: ['user'], 
+            where: {userId: parseInt(payload.userId)}
+        })
         return posts; 
    }
 

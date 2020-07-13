@@ -27,6 +27,17 @@ export class getCommentsResponse {
     total: number; 
 }
 
+@ObjectType()
+export class getPostsResponse {
+    @Field(() => [Post])
+    posts: Post[]; 
+
+    @Field(() => Int)
+    total: number; 
+}
+
+
+
 
 
 

@@ -7,8 +7,9 @@ import {Post} from '../entity/Post';
 import {PostInput, PostUpdateInput} from './types/InputTypes'; 
 import {isAuth} from './middlewares/isAuth'; 
 import { MyContext } from './types/MyContext';
-import {uploadResponse} from './types/OutputTypes'
-import {deletePostImg} from './utils/fileManagement'
+import {uploadResponse, getPostsResponse} from './types/OutputTypes';
+import {deletePostImg} from './utils/fileManagement'; 
+import {PaginationInput} from './types/InputTypes' ; 
 
 const getPostImgAndDelete = async (postId: number, userId: string) => {
     const post = await getConnection()
@@ -105,23 +106,53 @@ export class PostResolver {
         return post; 
    }
 
-   @Query(() => [Post])
+   @Query(() => getPostsResponse)
    @UseMiddleware(isAuth)
    async getPosts(
+    @Arg('paginationInput') {page, limit}: PaginationInput,
     @Ctx() {payload}: MyContext
    ){
-        const posts = await Post.find({
+        const take = limit || 10; 
+        let skip = (page -1) * take; 
+        if(page < 0){
+            skip = 0; 
+        } 
+
+        const [result, total] = await Post.findAndCount({
             relations: ['user'], 
-            where: {userId: parseInt(payload.userId)}
+            where: {userId: payload.userId},
+            take: take,
+            skip: skip
         })
-        return posts; 
+
+        return {
+            posts: result, 
+            total: total
+        }
    }
 
-   @Query(() => [Post])
-   async getAllPosts(){
-        const posts = await Post.find({ relations: ['user'] })
-        return posts; 
-   }
+   @Query(() => getPostsResponse)
+   async getAllPosts(
+       @Arg('paginationInput') {page, limit}: PaginationInput
+   ){ 
+
+        const take = limit || 10; 
+        let skip = (page -1) * take; 
+        if(page < 0){
+            skip = 0; 
+        } 
+
+        const [result, total] = await Post.findAndCount({
+            relations: ['user'], 
+            take: take,
+            skip: skip
+        })
+
+        return {
+            posts: result, 
+            total: total
+        }
+    }
 }
 
 

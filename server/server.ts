@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import {createConnection} from "typeorm";
 import * as express from "express"; 
+import * as path from 'path'; 
 import {ApolloServer} from "apollo-server-express"
 import {buildSchema} from 'type-graphql'; 
 import { AuthResolver } from "./resolvers/AuthResolver";
@@ -19,6 +20,8 @@ dotenv.config();
     const app = express(); 
     await createConnection(); 
 
+    app.use('/images/posts', express.static(path.join(__dirname, '/images/posts'))); 
+    app.use('/images/profiles', express.static(path.join(__dirname, '/images/profiles'))); 
     app.use(cookieParser()); 
     app.post('/refresh-token', refreshToken); 
 

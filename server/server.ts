@@ -11,12 +11,14 @@ import {CommentResolver} from './resolvers/CommentResolver';
 import {graphqlUploadExpress} from 'graphql-upload'; 
 import {refreshToken} from './resolvers/utils/auth'
 import * as cookieParser from 'cookie-parser';
+import {sendConfirmationEmail} from './resolvers/utils/mailManagement'
 
 import * as dotenv from 'dotenv'
 
 dotenv.config(); 
 
 (async () => {
+    sendConfirmationEmail('willenlealstudent@gmail.com', 'http://localhost:3000/confirm');
     const app = express(); 
     await createConnection(); 
 

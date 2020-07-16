@@ -2,6 +2,8 @@ import {Request, Response } from 'express'
 import * as jwt from 'jsonwebtoken'; 
 import {sign} from 'jsonwebtoken'; 
 import {User} from '../../entity/User'; 
+import {v4 as uuidv4} from 'uuid'; 
+import {redis} from '../../redisClient'; 
 
 export const setRefToken = (res: Response, user: User) => {
     res.cookie('sif', getRefToken(user) ,{
@@ -51,4 +53,12 @@ export const refreshToken = async (req: Request, res: Response) => {
 
     setRefToken(res, user); 
     return res.send({ok: true, authToken: getAuthToken(user).authToken}) ; 
+}
+
+export const createConfirmationUrl = async (userId: number) => {
+    const uniqueId = uuidv4(); 
+
+    await redis.set(uniqueId, userId, 'ex', 60 * 60 * 24) // 1 day 
+
+    return `http://localhost/3000/accounts/confirm/${uniqueId}`; 
 }

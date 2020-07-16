@@ -83,7 +83,7 @@ export class PostResolver {
 
     @Mutation(() => Post, {nullable: true})
     @UseMiddleware(isAuth)
-    async upatePost(
+    async updatePost(
         @Arg('id') id: number, 
         @Arg('input') input: PostUpdateInput,
         @Ctx() {payload}: MyContext

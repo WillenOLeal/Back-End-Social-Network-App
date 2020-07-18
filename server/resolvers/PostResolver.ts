@@ -38,6 +38,22 @@ export class PostResolver {
         return post.createdAt.toISOString(); 
     }
 
+    @FieldResolver()
+    
+        async likesCount(@Root() post: Post) {
+            const {likescount} = await getConnection()
+            .getRepository(Post)
+            .createQueryBuilder('post')
+            .select(['COUNT(users.id) AS likesCount'])
+            .leftJoin('post.likes', 'users')
+            .where('post.id = :id', {id: post.id})
+            .getRawOne(); 
+
+        return likescount; 
+    }
+
+ 
+
     @Mutation(() => uploadResponse)
     @UseMiddleware(isAuth)
     async postImageUpload(@Arg("file", () => GraphQLUpload)
@@ -113,6 +129,7 @@ export class PostResolver {
         .leftJoin('post.likes','user')
         .where('post.id = :id', {id: id})
         .getOne(); 
+    
 
         if(!post) return false
 
@@ -135,7 +152,6 @@ export class PostResolver {
             await post.save();
             return true; 
         }
-    
     }
 
     @Query(() => Post)

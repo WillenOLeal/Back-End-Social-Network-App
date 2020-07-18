@@ -30,7 +30,7 @@ export class Post extends BaseEntity {
 
     @Field(() => User)
     @ManyToOne(type => User, user => user.posts, { onDelete: 'CASCADE' })
-    user:  User
+    user:  User; 
 
     @OneToMany(type => Comment,  comment => comment.post, {cascade: true})
     comments: Comment[];
@@ -38,6 +38,9 @@ export class Post extends BaseEntity {
     @ManyToMany(type => User, {cascade: true, onDelete: "CASCADE"})
     @JoinTable({name: "likedPost"})
     likes: User[];
+
+    @Field(() => Int)
+    likesCount: number; 
 
     @Field(() => String)
     @CreateDateColumn({type: "timestamp"})

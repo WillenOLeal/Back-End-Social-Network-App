@@ -1,7 +1,7 @@
 import {Resolver, Mutation, Query, Arg, FieldResolver, Root, InputType, Field, UseMiddleware, Ctx} from'type-graphql'; 
 import { createWriteStream } from 'fs';
 import {v4 as uuidv4} from 'uuid'; 
-import {getConnection} from 'typeorm'; 
+import {getConnection, Any} from 'typeorm'; 
 import {GraphQLUpload, FileUpload} from 'graphql-upload'; 
 import {Post} from '../entity/Post'; 
 import {User} from '../entity/User';
@@ -11,6 +11,7 @@ import { MyContext } from './types/MyContext';
 import {uploadResponse, getPostsResponse} from './types/OutputTypes';
 import {deletePostImg} from './utils/fileManagement'; 
 import {PaginationInput} from './types/InputTypes' ; 
+import { stringify } from 'querystring';
 
 const getPostImgAndDelete = async (postId: number, userId: string) => {
     const post = await getConnection()
@@ -39,17 +40,11 @@ export class PostResolver {
     }
 
     @FieldResolver()
-    
-        async likesCount(@Root() post: Post) {
-            const {likescount} = await getConnection()
-            .getRepository(Post)
-            .createQueryBuilder('post')
-            .select(['COUNT(users.id) AS likesCount'])
-            .leftJoin('post.likes', 'users')
-            .where('post.id = :id', {id: post.id})
-            .getRawOne(); 
-
-        return likescount; 
+    async likesCount(
+        @Root() post: Post,
+        @Ctx() {likesLoader}: MyContext
+    ) {
+        return likesLoader.load(post.id); 
     }
 
  
@@ -179,6 +174,7 @@ export class PostResolver {
         const [result, total] = await Post.findAndCount({
             relations: ['user'], 
             where: {userId: payload.userId},
+            order: {createdAt: "DESC"},
             take: take,
             skip: skip
         })
@@ -202,6 +198,7 @@ export class PostResolver {
 
         const [result, total] = await Post.findAndCount({
             relations: ['user'], 
+            order: {createdAt: "DESC"},
             take: take,
             skip: skip
         })

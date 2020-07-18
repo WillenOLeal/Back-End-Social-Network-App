@@ -11,8 +11,8 @@ import {CommentResolver} from './resolvers/CommentResolver';
 import {graphqlUploadExpress} from 'graphql-upload'; 
 import {refreshToken} from './resolvers/utils/auth'
 import * as cookieParser from 'cookie-parser';
-
 import * as dotenv from 'dotenv'
+import { likesLoader } from "./loaders/likesLoader";
 
 dotenv.config(); 
 
@@ -31,7 +31,11 @@ dotenv.config();
         schema: await buildSchema({
             resolvers: [AuthResolver, UserResolver, PostResolver, CommentResolver]
         }),
-        context: ({req, res}) => ({req, res}),
+        context: ({req, res}) => ({
+            req,
+            res,
+            likesLoader: likesLoader()
+        }),
         uploads: false
     }); 
 

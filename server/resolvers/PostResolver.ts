@@ -11,7 +11,7 @@ import { MyContext } from './types/MyContext';
 import {uploadResponse, getPostsResponse} from './types/OutputTypes';
 import {deletePostImg} from './utils/fileManagement'; 
 import {PaginationInput} from './types/InputTypes' ; 
-import { stringify } from 'querystring';
+
 
 const getPostImgAndDelete = async (postId: number, userId: string) => {
     const post = await getConnection()
@@ -42,12 +42,10 @@ export class PostResolver {
     @FieldResolver()
     async likesCount(
         @Root() post: Post,
-        @Ctx() {likesLoader}: MyContext
+        @Ctx() {likesPostLoader}: MyContext
     ) {
-        return likesLoader.load(post.id); 
+        return likesPostLoader.load(post.id); 
     }
-
- 
 
     @Mutation(() => uploadResponse)
     @UseMiddleware(isAuth)
@@ -125,7 +123,6 @@ export class PostResolver {
         .where('post.id = :id', {id: id})
         .getOne(); 
     
-
         if(!post) return false
 
         const user = await User.findOne({where: {id: payload.userId}}); 

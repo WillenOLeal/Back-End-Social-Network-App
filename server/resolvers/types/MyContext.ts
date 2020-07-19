@@ -1,9 +1,11 @@
 import {Request, Response} from 'express'; 
-import { likesLoader } from '../../loaders/likesLoader';
+import { likesPostLoader } from '../../loaders/likesPostLoader';
+import { likesCommentLoader } from '../../loaders/likesCommentLoader';
 
 export interface MyContext {
     req: Request, 
     res: Response, 
     payload?: {userId: string}, 
-    likesLoader: ReturnType<typeof likesLoader> 
+    likesPostLoader: ReturnType<typeof likesPostLoader>, 
+    likesCommentLoader: ReturnType<typeof likesCommentLoader>
 }

@@ -12,7 +12,8 @@ import {graphqlUploadExpress} from 'graphql-upload';
 import {refreshToken} from './resolvers/utils/auth'
 import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv'
-import { likesLoader } from "./loaders/likesLoader";
+import { likesPostLoader } from "./loaders/likesPostLoader";
+import { likesCommentLoader } from "./loaders/likesCommentLoader";
 
 dotenv.config(); 
 
@@ -34,7 +35,8 @@ dotenv.config();
         context: ({req, res}) => ({
             req,
             res,
-            likesLoader: likesLoader()
+            likesLoader: likesPostLoader(),
+            likesCommentLoader: likesCommentLoader()
         }),
         uploads: false
     }); 

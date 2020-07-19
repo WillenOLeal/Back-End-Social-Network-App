@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, JoinColumn,  ManyToOne, BaseEntity} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany, JoinTable,  ManyToOne, BaseEntity} from "typeorm";
 import { ObjectType, Field, Int, ID} from "type-graphql";
 import {Post} from './Post'; 
 import {User} from './User'; 
@@ -30,6 +30,13 @@ export class Comment extends BaseEntity{
 
     @ManyToOne(type => Post, post => post.comments, { onDelete: 'CASCADE' })
     post?:  Post
+
+    @ManyToMany(type => User, {cascade: true, onDelete: "CASCADE"})
+    @JoinTable({name: "likedComment"})
+    likes: User[];
+
+    @Field(() => Int, {nullable: true})
+    likesCount?: number; 
 
     @Field(() => String, {nullable: true})
     @CreateDateColumn({type: "timestamp"})

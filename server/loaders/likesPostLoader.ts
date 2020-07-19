@@ -26,4 +26,4 @@ const batchLikes: batchLike = async (ids) => {
         return likes; 
 }
 
-export const likesLoader = () => new DataLoader<number, number>(batchLikes)
+export const likesPostLoader = () => new DataLoader<number, number>(batchLikes)

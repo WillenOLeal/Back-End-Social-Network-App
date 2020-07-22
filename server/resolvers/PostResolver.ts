@@ -1,4 +1,5 @@
-import {Resolver, Mutation, Query, Arg, FieldResolver, Root, InputType, Field, UseMiddleware, Ctx} from'type-graphql'; 
+import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Subscription, UseMiddleware, Ctx, PubSub} from'type-graphql'; 
+import { PubSubEngine } from "graphql-subscriptions";
 import { createWriteStream } from 'fs';
 import {v4 as uuidv4} from 'uuid'; 
 import {getConnection, Any} from 'typeorm'; 
@@ -10,7 +11,8 @@ import {isAuth} from './middlewares/isAuth';
 import { MyContext } from './types/MyContext';
 import {uploadResponse, getPostsResponse} from './types/OutputTypes';
 import {deletePostImg} from './utils/fileManagement'; 
-import {PaginationInput} from './types/InputTypes' ; 
+import {PaginationInput} from './types/InputTypes';
+import { inspect } from 'util'; 
 
 
 const getPostImgAndDelete = async (postId: number, userId: string) => {
@@ -44,6 +46,7 @@ export class PostResolver {
         @Root() post: Post,
         @Ctx() {likesPostLoader}: MyContext
     ) {
+  
         return likesPostLoader.load(post.id); 
     }
 
@@ -146,14 +149,20 @@ export class PostResolver {
         }
     }
 
-    @Query(() => Post)
+    @Query(() => Post, {nullable: true})
     @UseMiddleware(isAuth)
     async getPost(
+        @PubSub() pubSub: PubSubEngine,
         @Arg('id') id: number,
         @Ctx() {payload}: MyContext
     ){
-        const post = await Post.findOne({id: id, userId: parseInt(payload.userId)}); 
-        return post; 
+        const posts = await Post.find({
+            where: {id: id, userId: parseInt(payload.userId)},
+            relations: ['user'],
+            take: 1
+        }); 
+        if(!post) return null; 
+        return posts[0]; 
     }
 
     @Query(() => getPostsResponse)

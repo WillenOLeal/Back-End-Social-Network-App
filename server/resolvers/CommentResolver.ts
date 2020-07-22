@@ -25,7 +25,7 @@ export class CommentResolver {
         return likesCommentLoader.load(comment.id); 
     }
 
-   @Mutation(() => Comment)
+   @Mutation(() => Comment, {nullable: true})
    @UseMiddleware(isAuth)
    async createComment(
        @Arg('postId') postId: number, 
@@ -40,7 +40,7 @@ export class CommentResolver {
             return newComment; 
         }
         else {
-            return {}; 
+            return null; 
         }
    }
 
@@ -118,7 +118,7 @@ export class CommentResolver {
             comments: result, 
             total: total
         }
-}
+    }
 }
 
 

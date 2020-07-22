@@ -8,38 +8,38 @@ import {User} from './User';
 @Entity()
 export class Comment extends BaseEntity{
 
-    @Field(() => ID, {nullable: true})
+    @Field(() => ID)
     @PrimaryGeneratedColumn()
-    id?: number;
+    id: number;
 
-    @Field({nullable: true})
+    @Field()
     @Column()
-    text?: string;
+    text: string;
 
-    @Field(() => Int, {nullable: true})
+    @Field(() => Int)
     @Column()
-    userId?: number; 
+    userId: number; 
 
     @Field(() => User)
     @ManyToOne(type => User, user => user.comments, { onDelete: 'CASCADE' })
-    user?:  User
+    user:  User
 
-    @Field(() => Int, {nullable: true})
+    @Field(() => Int)
     @Column()
-    postId?: number; 
+    postId: number; 
 
     @ManyToOne(type => Post, post => post.comments, { onDelete: 'CASCADE' })
-    post?:  Post
+    post:  Post
 
     @ManyToMany(type => User, {cascade: true, onDelete: "CASCADE"})
     @JoinTable({name: "likedComment"})
     likes: User[];
 
-    @Field(() => Int, {nullable: true})
-    likesCount?: number; 
+    @Field(() => Int)
+    likesCount: number; 
 
-    @Field(() => String, {nullable: true})
+    @Field(() => String)
     @CreateDateColumn({type: "timestamp"})
-    createdAt?: Date; 
+    createdAt: Date; 
 
 }

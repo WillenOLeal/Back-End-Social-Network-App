@@ -1,9 +1,12 @@
 import {Request, Response } from 'express'
+import {AuthenticationError} from 'apollo-server-express';
+import {verify} from 'jsonwebtoken'
 import * as jwt from 'jsonwebtoken'; 
 import {sign} from 'jsonwebtoken'; 
 import {User} from '../../entity/User'; 
 import {v4 as uuidv4} from 'uuid'; 
 import {redis} from '../../redisClient'; 
+
 
 export const setRefToken = (res: Response, user: User) => {
     res.cookie('sif', getRefToken(user) ,{
@@ -61,4 +64,19 @@ export const createConfirmationUrl = async (userId: number) => {
     await redis.set(uniqueId, userId, 'ex', 60 * 60 * 24) // 1 day 
 
     return `http://localhost/3000/accounts/confirm/${uniqueId}`; 
+}
+
+export const verifyAuthTokenOverWebSocket = async (connectionParams: any) => {
+    const authHeader = connectionParams['authorization'];
+    const token  = authHeader && authHeader.split(' ')[1]; 
+
+    if(!token) throw new AuthenticationError('Not Authenticated')
+
+    try{
+        const payload = verify(token, process.env.AUTH_SECRET)
+        return payload; 
+    }
+    catch(err) {
+        throw new AuthenticationError('Not Authenticated'); 
+    }
 }

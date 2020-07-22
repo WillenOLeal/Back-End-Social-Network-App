@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import {createConnection} from "typeorm";
 import * as express from "express"; 
+import * as http from 'http'; 
 import * as path from 'path'; 
 import {ApolloServer} from "apollo-server-express"
 import {buildSchema} from 'type-graphql'; 
@@ -14,6 +15,8 @@ import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv'
 import { likesPostLoader } from "./loaders/likesPostLoader";
 import { likesCommentLoader } from "./loaders/likesCommentLoader";
+import { verifyAuthTokenOverWebSocket } from './resolvers/utils/auth';
+
 
 dotenv.config(); 
 
@@ -32,12 +35,23 @@ dotenv.config();
         schema: await buildSchema({
             resolvers: [AuthResolver, UserResolver, PostResolver, CommentResolver]
         }),
-        context: ({req, res}) => ({
-            req,
-            res,
-            likesLoader: likesPostLoader(),
-            likesCommentLoader: likesCommentLoader()
-        }),
+        context: ({req, res, connection}) =>  {
+            if(!req || !req.headers)
+                return connection.context; 
+            else
+                return {
+                    req,
+                    res,
+                    likesPostLoader: likesPostLoader(),
+                    likesCommentLoader: likesCommentLoader()
+                }
+        },
+        subscriptions: {
+            onConnect: async (connectionParams, webScoket) => {
+                const payload = await verifyAuthTokenOverWebSocket(connectionParams)
+                return payload; 
+            }
+        },
         uploads: false
     }); 
 
@@ -45,7 +59,10 @@ dotenv.config();
         app, cors: false
     })
 
-    app.listen(3000, () => {
+    const httpServer = http.createServer(app);
+    apolloServer.installSubscriptionHandlers(httpServer);
+
+    httpServer.listen(3000, () => {
         console.log("Listening on port 3000"); 
     })
 })();

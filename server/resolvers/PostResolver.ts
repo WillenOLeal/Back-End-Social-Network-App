@@ -15,7 +15,7 @@ import {PaginationInput} from './types/InputTypes';
 import { inspect } from 'util'; 
 
 
-const getPostImgAndDelete = async (postId: number, userId: string) => {
+const getPostImgAndDelete = async (postId: number, userId: number) => {
     const post = await getConnection()
     .getRepository(Post)
     .createQueryBuilder("post")
@@ -78,7 +78,7 @@ export class PostResolver {
        @Arg('postInput', () => PostInput) postInput: PostInput,
        @Ctx() {payload}: MyContext
    ) {
-        const post = await Post.create({...postInput, userId: parseInt(payload.userId)}).save();
+        const post = await Post.create({...postInput, userId: payload.userId}).save();
         const user = await User.findOne({where: {id: payload.userId}}); 
         post.user = user; 
         return  post; 
@@ -91,7 +91,7 @@ export class PostResolver {
        @Ctx() {payload}: MyContext
     ){
         getPostImgAndDelete(id, payload.userId); 
-        const result = await Post.delete({id: id, userId: parseInt(payload.userId)});
+        const result = await Post.delete({id: id, userId: payload.userId});
         if (result.affected > 0) return true; 
         else return false; 
     }
@@ -105,7 +105,7 @@ export class PostResolver {
      ){
         if (input.imgName)  getPostImgAndDelete(id, payload.userId); 
 
-        const result = await Post.update({id: id, userId: parseInt(payload.userId)}, input)
+        const result = await Post.update({id: id, userId: payload.userId}, input)
         if (result.affected > 0) 
             return await Post.findOne({id: id}); 
         else return null; 
@@ -133,9 +133,9 @@ export class PostResolver {
         let hasLiked = false; 
 
         for(let userObj of post.likes){
-            if(userObj.id == parseInt(payload.userId)) {
+            if(userObj.id == payload.userId) {
                 hasLiked = true; 
-                const likes = post.likes.filter(user => user.id !== parseInt(payload.userId))
+                const likes = post.likes.filter(user => user.id !== payload.userId)
                 post.likes = [...likes]; 
                 await post.save(); 
                 return true; 
@@ -157,11 +157,11 @@ export class PostResolver {
         @Ctx() {payload}: MyContext
     ){
         const posts = await Post.find({
-            where: {id: id, userId: parseInt(payload.userId)},
+            where: {id: id, userId: payload.userId},
             relations: ['user'],
             take: 1
         }); 
-        if(!post) return null; 
+        if(!posts) return null; 
         return posts[0]; 
     }
 

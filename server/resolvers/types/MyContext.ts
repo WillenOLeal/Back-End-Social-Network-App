@@ -5,7 +5,7 @@ import { likesCommentLoader } from '../../loaders/likesCommentLoader';
 export interface MyContext {
     req: Request, 
     res: Response, 
-    payload?: {userId: string}, 
+    payload?: {userId: number}, 
     likesPostLoader: ReturnType<typeof likesPostLoader>, 
     likesCommentLoader: ReturnType<typeof likesCommentLoader>
 }

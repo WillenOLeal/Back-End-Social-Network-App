@@ -11,7 +11,6 @@ import {deleteProfilePicture} from './utils/fileManagement'
 import {isAuth} from './middlewares/isAuth'; 
 import {MyContext} from './types/MyContext'; 
 import {Friendship} from '../entity/Friendship'; 
-import { inspect } from "util";
 import { SenderPlusReceiverId } from "./types/varTypes";
 
 const friendReq = 'FRIEND_REQ'; 
@@ -85,14 +84,16 @@ export class UserResolver {
      const receiver = await User.findOne({id: userId}); 
      if(!receiver) return false; 
 
-     const friendship = await Friendship.findOne({senderId: payload.userId, receiverId: userId})
+      const friendship = await Friendship.findOne({where: [
+        {senderId: payload.userId, receiverId: userId},
+        {senderId: userId, receiverId: payload.userId}
+      ]})
 
      if(friendship) return false; 
 
      const sender = await User.findOne({id: payload.userId}); 
      const senderPlusReceiverId: SenderPlusReceiverId = {...sender, receiverId: receiver.id}; 
 
-     
      const pubSubPromise = pubSub.publish(friendReq, senderPlusReceiverId);
      const friendsPromise = Friendship.insert({senderId: payload.userId, receiverId: userId, status: 0}); 
 
@@ -115,7 +116,6 @@ export class UserResolver {
       }
 
       return false; 
-
    }
 
    @Query(() => [User], {nullable: true})

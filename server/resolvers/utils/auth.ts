@@ -58,14 +58,6 @@ export const refreshToken = async (req: Request, res: Response) => {
     return res.send({ok: true, authToken: getAuthToken(user).authToken}) ; 
 }
 
-export const createConfirmationUrl = async (userId: number) => {
-    const uniqueId = uuidv4(); 
-
-    await redis.set(uniqueId, userId, 'ex', 60 * 60 * 24) // 1 day 
-
-    return `http://localhost/3000/accounts/confirm/${uniqueId}`; 
-}
-
 export const verifyAuthTokenOverWebSocket = async (connectionParams: any) => {
     const authHeader = connectionParams['authorization'];
     const token  = authHeader && authHeader.split(' ')[1]; 

@@ -5,14 +5,10 @@ import * as bcrypt  from 'bcrypt';
 import {UserInput} from './types/InputTypes'; 
 import {UserInputError, AuthenticationError} from 'apollo-server-express';
 import {MyContext} from './types/MyContext'; 
-import {getAuthToken, getRefToken} from './utils/auth'; 
+import {getAuthToken} from './utils/auth'; 
 import {loginResponse} from './types/OutputTypes'
 import {Profile} from '../entity/Profile';
 import {setRefToken} from './utils/auth'; 
-import { sendConfirmationEmail } from './utils/mailManagement';
-import { createConfirmationUrl } from './utils/auth';
-import {redis} from '../redisClient'; 
-
 
 
 @Resolver(User)
@@ -33,21 +29,7 @@ export class AuthResolver {
         const hashedPassword = await bcrypt.hash(password, 12); 
         const newUser = await User.create({username: username.toLowerCase(), email: email.toLowerCase(), password: hashedPassword}).save(); 
         Profile.create({pictureName: "", userId: newUser.id}).save(); 
-        sendConfirmationEmail(email,await createConfirmationUrl(newUser.id))
         return newUser; 
-   }
-
-   @Mutation(() => Boolean)
-   async confirmUser(
-       @Arg('uuid') uuid: string
-   ){
-       const userId = await redis.get(uuid); 
-       if(!userId) return false; 
-       else {
-        await User.update({id: parseInt(userId)}, {emailConfirmed: true}); 
-        await redis.del(uuid); 
-        return true; 
-       }
    }
 
    @Mutation(() => loginResponse)
@@ -60,7 +42,6 @@ export class AuthResolver {
         if (!user) throw new AuthenticationError('Authentication failed. Invalid credentials'); 
         const isValid = await bcrypt.compare(password, user.password); 
         if(!isValid) throw new AuthenticationError('Authenctication failed. Invalid credentials'); 
-        if(!user.emailConfirmed) throw new AuthenticationError('Account not activated'); 
 
         setRefToken(res, user); 
         return getAuthToken(user);  

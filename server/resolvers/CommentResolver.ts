@@ -34,8 +34,8 @@ export class CommentResolver {
    ) {
         const post = await Post.findOne({id: postId}); 
         if(post) {
-            const newComment = await Comment.create({text: text, postId: postId, userId: parseInt(payload.userId)}).save();
-            const user = await  User.findOne({id: parseInt(payload.userId)}); 
+            const newComment = await Comment.create({text: text, postId: postId, userId: payload.userId}).save();
+            const user = await  User.findOne({id: payload.userId}); 
             newComment.user = user; 
             return newComment; 
         }
@@ -50,7 +50,7 @@ export class CommentResolver {
        @Arg('id') id: number,
        @Ctx() {payload}: MyContext
     ){
-        const result = await Comment.delete({id: id, userId: parseInt(payload.userId)});
+        const result = await Comment.delete({id: id, userId: payload.userId});
         if (result.affected > 0) return true; 
         else return false; 
     }
@@ -78,9 +78,9 @@ export class CommentResolver {
         let hasLiked = false; 
         
         for(let userObj of comment.likes){
-            if(userObj.id == parseInt(payload.userId)) {
+            if(userObj.id == payload.userId) {
                 hasLiked = true; 
-                const likes = comment.likes.filter(user => user.id !== parseInt(payload.userId))
+                const likes = comment.likes.filter(user => user.id !== payload.userId)
                 comment.likes = [...likes]; 
                 await comment.save(); 
                 return true; 

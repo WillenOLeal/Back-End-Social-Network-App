@@ -16,6 +16,7 @@ import * as dotenv from 'dotenv'
 import { likesPostLoader } from "./loaders/likesPostLoader";
 import { likesCommentLoader } from "./loaders/likesCommentLoader";
 import { verifyAuthTokenOverWebSocket } from './resolvers/utils/auth';
+import RedisPubSub from './resolvers/utils/redisPubSub';
 
 
 dotenv.config(); 
@@ -33,7 +34,8 @@ dotenv.config();
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [AuthResolver, UserResolver, PostResolver, CommentResolver]
+            resolvers: [AuthResolver, UserResolver, PostResolver, CommentResolver],
+            pubSub: RedisPubSub
         }),
         context: ({req, res, connection}) =>  {
             if(!req || !req.headers)

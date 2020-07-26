@@ -1,4 +1,4 @@
-import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Field, InputType, ObjectType, Ctx} from'type-graphql'; 
+import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Ctx} from'type-graphql'; 
 import { getConnection } from 'typeorm';
 import {User} from '../entity/User'; 
 import * as bcrypt  from 'bcrypt'; 

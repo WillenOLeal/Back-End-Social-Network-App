@@ -2,7 +2,7 @@ import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Subscription, UseMi
 import { PubSubEngine } from "graphql-subscriptions";
 import { createWriteStream } from 'fs';
 import {v4 as uuidv4} from 'uuid'; 
-import {getConnection, Any} from 'typeorm'; 
+import {getConnection, Any, In} from 'typeorm'; 
 import {GraphQLUpload, FileUpload} from 'graphql-upload'; 
 import {Post} from '../entity/Post'; 
 import {User} from '../entity/User';
@@ -12,7 +12,7 @@ import { MyContext } from './types/MyContext';
 import {uploadResponse, getPostsResponse} from './types/OutputTypes';
 import {deletePostImg} from './utils/fileManagement'; 
 import {PaginationInput} from './types/InputTypes';
-import { inspect } from 'util'; 
+import { Friendship } from '../entity/Friendship';
 
 
 const getPostImgAndDelete = async (postId: number, userId: number) => {
@@ -26,6 +26,30 @@ const getPostImgAndDelete = async (postId: number, userId: number) => {
     .getOne();
 
     if(post) deletePostImg(post.imgName); 
+}
+
+const getFriendIds = async (userId: number) => {
+
+    const STATUS:number = 1; 
+
+    const friends  = await getConnection()
+    .getRepository(Friendship)
+    .createQueryBuilder('friendship')
+    .select(['friendship.senderId', 'friendship.receiverId'])
+    .where('friendship.senderId = :id AND friendship.status = :status', {id: userId, status: STATUS})
+    .orWhere('friendship.receiverId = :id AND friendship.status = :status', {id: userId, status: STATUS})
+    .getMany();  
+
+    let ids:number[] = []; 
+
+    if(friends){
+        friends.forEach((friend) => {
+            if(friend.senderId != userId) ids.push(friend.senderId); 
+            if(friend.receiverId != userId) ids.push(friend.receiverId); 
+        }); 
+    }
+
+    return [...new Set(ids)]; 
 }
 
 @Resolver(Post)
@@ -78,9 +102,11 @@ export class PostResolver {
        @Arg('postInput', () => PostInput) postInput: PostInput,
        @Ctx() {payload}: MyContext
    ) {
-        const post = await Post.create({...postInput, userId: payload.userId}).save();
-        const user = await User.findOne({where: {id: payload.userId}}); 
-        post.user = user; 
+        const postPromise = Post.create({...postInput, userId: payload.userId}).save();
+        const userPromise = User.findOne({where: {id: payload.userId}}); 
+        const values = await Promise.all([postPromise, userPromise]); 
+        const post = values[0];
+        post.user = values[1]; 
         return  post; 
    }
 
@@ -191,9 +217,11 @@ export class PostResolver {
         }
     }
 
-    @Query(() => getPostsResponse)
+    @Query(() => getPostsResponse, {nullable: true})
+    @UseMiddleware(isAuth)
     async getAllPosts(
-        @Arg('paginationInput') {page, limit}: PaginationInput
+        @Arg('paginationInput') {page, limit}: PaginationInput, 
+        @Ctx() {payload}: MyContext
     ){ 
 
         const take = limit || 10; 
@@ -202,9 +230,13 @@ export class PostResolver {
             skip = 0; 
         } 
 
+        const ids:number[] = await getFriendIds(payload.userId)
+        if(!ids) return null
+
         const [result, total] = await Post.findAndCount({
             relations: ['user'], 
             order: {createdAt: "DESC"},
+            where: {userId: In(ids)},
             take: take,
             skip: skip
         })

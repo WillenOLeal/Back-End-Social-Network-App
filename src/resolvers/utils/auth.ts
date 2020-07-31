@@ -4,8 +4,6 @@ import {verify} from 'jsonwebtoken'
 import * as jwt from 'jsonwebtoken'; 
 import {sign} from 'jsonwebtoken'; 
 import {User} from '../../entity/User'; 
-import {v4 as uuidv4} from 'uuid'; 
-import {redis} from '../../redisClient'; 
 
 
 export const setRefToken = (res: Response, user: User) => {

@@ -6,17 +6,23 @@
       "@types/bcrypt": "^3.0.0",
       "@types/cookie-parser": "^1.4.2",
       "@types/express": "^4.17.6",
+      "@types/faker": "^4.1.12",
       "@types/graphql-upload": "^8.0.3",
       "@types/ioredis": "^4.17.2",
+      "@types/jest": "^26.0.8",
       "@types/jsonwebtoken": "^8.5.0",
       "@types/node": "^14.0.13",
       "@types/uuid": "^8.0.0",
       "class-validator": "^0.12.2",
       "dotenv": "^8.2.0",
+      "faker": "^4.1.0",
+      "husky": "^4.2.5",
+      "jest": "^26.2.2",
       "nodemon": "^2.0.4",
+      "ts-jest": "^26.1.4",
       "ts-node": "8.10.2",
       "ts-node-dev": "^1.0.0-pre.48",
-      "typescript": "3.9.5"
+      "typescript": "^3.9.7"
    },
    "dependencies": {
       "apollo-server-express": "^2.14.3",
@@ -39,6 +45,14 @@
    "scripts": {
       "build": "tsc",
       "start": "ts-node-dev --respawn --transpile-only src/server.ts",
-      "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js"
-   }
+      "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
+      "db:setup": "ts-node ./src/test-utils/dbSetup.ts",
+      "test": "yarn run db:setup && jest --forceExit --detectOpenHandles"
+   }, 
+
+   "husky": {
+      "hooks": {
+        "pre-commit": "yarn run test"
+      }
+    }
 }

@@ -3,23 +3,16 @@ import {createConnection} from "typeorm";
 import * as express from "express"; 
 import * as http from 'http'; 
 import * as path from 'path'; 
-import {ApolloServer} from "apollo-server-express"
-import {buildSchema} from 'type-graphql'; 
-import { AuthResolver } from "./resolvers/AuthResolver";
-import {PostResolver}from './resolvers/PostResolver'; 
-import {UserResolver} from './resolvers/UserResolver'; 
-import {CommentResolver} from './resolvers/CommentResolver'; 
+import {ApolloServer} from "apollo-server-express" 
 import {graphqlUploadExpress} from 'graphql-upload'; 
 import {refreshToken} from './resolvers/utils/auth'
 import * as cookieParser from 'cookie-parser';
-import * as dotenv from 'dotenv'
 import { likesPostLoader } from "./loaders/likesPostLoader";
 import { likesCommentLoader } from "./loaders/likesCommentLoader";
 import { verifyAuthTokenOverWebSocket } from './resolvers/utils/auth';
-import RedisPubSub from './resolvers/utils/redisPubSub';
+import {createSchema} from './utils/createSchema';
+import 'dotenv/config';
 
-
-dotenv.config(); 
 
 (async () => {
     const app = express(); 
@@ -33,10 +26,7 @@ dotenv.config();
     app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
 
     const apolloServer = new ApolloServer({
-        schema: await buildSchema({
-            resolvers: [AuthResolver, UserResolver, PostResolver, CommentResolver],
-            pubSub: RedisPubSub
-        }),
+        schema: await createSchema(),
         context: ({req, res, connection}) =>  {
             if(!req || !req.headers)
                 return connection.context; 

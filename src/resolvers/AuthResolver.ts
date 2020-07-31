@@ -24,10 +24,15 @@ export class AuthResolver {
        @Arg('userInput', () => UserInput) userInput: UserInput, 
    ) {
        const {password, email, username} = userInput; 
-       const user = await User.findOne({where: [{email: email.toLowerCase()}, {username: username.toLowerCase()}]}); 
+       const user = await User.findOne(
+        {where: [
+           {email: email.toLowerCase()},
+           {username: username.toLowerCase()},
+           {username: username},
+        ]}); 
        if (user) throw new UserInputError('This email or username is alreay taken'); 
         const hashedPassword = await bcrypt.hash(password, 12); 
-        const newUser = await User.create({username: username.toLowerCase(), email: email.toLowerCase(), password: hashedPassword}).save(); 
+        const newUser = await User.create({username: username, email: email.toLowerCase(), password: hashedPassword}).save(); 
         Profile.create({pictureName: "", userId: newUser.id}).save(); 
         return newUser; 
    }

@@ -1,4 +1,4 @@
-import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Ctx} from'type-graphql'; 
+import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Ctx, Int} from'type-graphql'; 
 import { getConnection } from 'typeorm';
 import {User} from '../entity/User'; 
 import * as bcrypt  from 'bcrypt'; 
@@ -54,7 +54,7 @@ export class AuthResolver {
 
    @Mutation(() => Boolean)
    async  revokeRefreshToken(
-       @Arg('userId') userId: number
+       @Arg('userId', () => Int!) userId: number
    ){
         const result = await getConnection().getRepository(User).increment({id: userId}, 'tokenVersion', 1); 
         if(result.affected > 0) return true

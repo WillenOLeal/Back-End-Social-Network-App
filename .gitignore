@@ -9,7 +9,7 @@ images/posts/*
 !images/profiles/.gitkeep
 !images/posts/.gitkeep
 .env 
-.yarn.lock
+yarn.lock
 
 # Logs
 logs

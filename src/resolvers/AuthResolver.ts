@@ -1,7 +1,7 @@
 import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Ctx, Int} from'type-graphql'; 
 import { getConnection } from 'typeorm';
 import {User} from '../entity/User'; 
-import * as bcrypt  from 'bcrypt'; 
+import bcrypt  from 'bcrypt'; 
 import {UserInput} from './types/InputTypes'; 
 import {UserInputError, AuthenticationError} from 'apollo-server-express';
 import {MyContext} from './types/MyContext'; 

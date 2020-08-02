@@ -1,4 +1,4 @@
-import * as DataLoader from "dataloader";
+import DataLoader from "dataloader";
 import {getConnection} from 'typeorm'; 
 import {Comment} from '../entity/Comment'; 
 

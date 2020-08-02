@@ -1,7 +1,7 @@
 import { Connection } from 'typeorm';
 import {testConn} from '../../test-utils/testConn';
 import { graphqlCall } from '../../test-utils/graphqlCall';
-import * as faker from 'faker';
+import faker from 'faker';
 import { User } from '../../entity/User';
 import { Profile } from '../../entity/Profile';
 

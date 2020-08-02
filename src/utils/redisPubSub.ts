@@ -1,5 +1,5 @@
 import { RedisPubSub } from 'graphql-redis-subscriptions';
-import * as Redis from 'ioredis';
+import Redis from 'ioredis';
  
 const options = {
   host: '127.0.0.1',

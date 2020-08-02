@@ -1,7 +1,7 @@
 import {Request, Response } from 'express'
 import {AuthenticationError} from 'apollo-server-express';
 import {verify} from 'jsonwebtoken'
-import * as jwt from 'jsonwebtoken'; 
+import jwt from 'jsonwebtoken'; 
 import {sign} from 'jsonwebtoken'; 
 import {User} from '../../entity/User'; 
 

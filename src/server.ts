@@ -1,12 +1,12 @@
 import "reflect-metadata";
 import {createConnection} from "typeorm";
-import * as express from "express"; 
-import * as http from 'http'; 
-import * as path from 'path'; 
+import express from "express"; 
+import http from 'http'; 
+import path from 'path'; 
 import {ApolloServer} from "apollo-server-express" 
 import {graphqlUploadExpress} from 'graphql-upload'; 
 import {refreshToken} from './resolvers/utils/auth'
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import { likesPostLoader } from "./loaders/likesPostLoader";
 import { likesCommentLoader } from "./loaders/likesCommentLoader";
 import { verifyAuthTokenOverWebSocket } from './resolvers/utils/auth';

@@ -1,5 +1,4 @@
 import { createConnection } from 'typeorm';
-import { dirname } from 'path';
 import 'dotenv/config';
 
 export const testConn = async (drop: boolean = false) => {

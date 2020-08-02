@@ -1,5 +1,4 @@
-import {ObjectType, Field, ID, Int, FieldResolver, Root} from 'type-graphql'; 
-import { User } from '../../entity/User';
+import {ObjectType, Field, Int} from 'type-graphql'; 
 import { Post } from '../../entity/Post';
 import { Comment } from '../../entity/Comment';
 

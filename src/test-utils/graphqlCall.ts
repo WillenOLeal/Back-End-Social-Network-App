@@ -7,13 +7,13 @@ interface Options {
     variableValues?: {
         [key: string]: any
     }
-    userId?: number
+    authToken?: string; 
 }
 
 let schema: GraphQLSchema; 
 
 
-export const graphqlCall = async ({source, variableValues, userId}: Options) => {
+export const graphqlCall = async ({source, variableValues, authToken}: Options) => {
 
     if(!schema) schema = await createSchema(); 
     return graphql({
@@ -22,14 +22,13 @@ export const graphqlCall = async ({source, variableValues, userId}: Options) => 
         variableValues, 
         contextValue: {
             req: {
-                
+                headers: {
+                    authorization: authToken
+                }
             },
             res: {
                 cookie: jest.fn()
             },
-            payload: {
-                uaserId: userId
-            }
         }
     }); 
 }

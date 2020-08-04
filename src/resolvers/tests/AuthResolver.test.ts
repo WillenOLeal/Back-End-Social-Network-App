@@ -1,27 +1,10 @@
-import { Connection } from 'typeorm';
-import {testConn} from '../../test-utils/testConn';
 import { graphqlCall } from '../../test-utils/graphqlCall';
-import faker from 'faker';
 import { User } from '../../entity/User';
 import { Profile } from '../../entity/Profile';
+import dbInit from '../../test-utils/dbConnInit';
+import { getUserObj } from '../../test-utils/util-functions';
 
-let conn: Connection; 
-
-beforeAll(async () => {
-    conn = await testConn(); 
-})
-afterAll(async () => {
-    await conn.close();
-})
-
-
-const getUserObj = () => {
-    return {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password()
-    }
-}
+dbInit(); 
 
 const registerMutation = `
     mutation Regiter($data: UserInput!) {

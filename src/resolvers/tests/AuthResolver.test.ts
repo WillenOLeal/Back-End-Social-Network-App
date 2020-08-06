@@ -51,6 +51,7 @@ describe('Register', () => {
             }
         });
 
+
         const newUser = await User.findOne({where: {email: user.email.toLowerCase()}}); 
 
         expect(newUser).toBeDefined(); 
@@ -99,11 +100,9 @@ describe('Login', () => {
 
 describe('Revoke Refresh Token', () => {
     it('Updates TokenVersion field in the User table', async () => {
+
+        const newUser = await User.findOne({id: 1}); 
         
-        const user = getUserObj()
-
-        const newUser = await User.create(user).save(); 
-
         const response = await graphqlCall({
             source: revokeTokenMutation, 
             variableValues: {

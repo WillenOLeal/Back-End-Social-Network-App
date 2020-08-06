@@ -1,8 +1,8 @@
-import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Subscription, UseMiddleware, Ctx, PubSub} from'type-graphql'; 
+import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Subscription, UseMiddleware, Ctx, PubSub, Int} from'type-graphql'; 
 import { PubSubEngine } from "graphql-subscriptions";
 import { createWriteStream } from 'fs';
 import {v4 as uuidv4} from 'uuid'; 
-import {getConnection, Any, In} from 'typeorm'; 
+import {getConnection, Any, In, AdvancedConsoleLogger} from 'typeorm'; 
 import {GraphQLUpload, FileUpload} from 'graphql-upload'; 
 import {Post} from '../entity/Post'; 
 import {User} from '../entity/User';
@@ -113,7 +113,7 @@ export class PostResolver {
    @Mutation(() => Boolean)
    @UseMiddleware(isAuth)
    async deletePost(
-       @Arg('id') id: number,
+       @Arg('id', () => Int) id: number,
        @Ctx() {payload}: MyContext
     ){
         getPostImgAndDelete(id, payload.userId); 
@@ -125,15 +125,21 @@ export class PostResolver {
     @Mutation(() => Post, {nullable: true})
     @UseMiddleware(isAuth)
     async updatePost(
-        @Arg('id') id: number, 
+        @Arg('id', () => Int) id: number, 
         @Arg('input') input: PostUpdateInput,
         @Ctx() {payload}: MyContext
      ){
         if (input.imgName)  getPostImgAndDelete(id, payload.userId); 
 
         const result = await Post.update({id: id, userId: payload.userId}, input)
-        if (result.affected > 0) 
-            return await Post.findOne({id: id}); 
+        if (result.affected > 0) {
+            let postPromise =  Post.findOne({id: id});
+            let userPromise = User.findOne({id: payload.userId})
+            const response = await Promise.all([postPromise, userPromise]); 
+            const post = response[0]; 
+            post.user = response[1]; 
+            return post; 
+        }
         else return null; 
      }
 
@@ -178,8 +184,7 @@ export class PostResolver {
     @Query(() => Post, {nullable: true})
     @UseMiddleware(isAuth)
     async getPost(
-        @PubSub() pubSub: PubSubEngine,
-        @Arg('id') id: number,
+        @Arg('id', () => Int) id: number,
         @Ctx() {payload}: MyContext
     ){
         const posts = await Post.find({
@@ -231,7 +236,7 @@ export class PostResolver {
         } 
 
         const ids:number[] = await getFriendIds(payload.userId)
-        if(!ids) return null
+        if(ids.length === 0) return null
 
         const [result, total] = await Post.findAndCount({
             relations: ['user'], 

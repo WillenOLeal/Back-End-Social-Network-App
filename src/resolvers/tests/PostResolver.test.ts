@@ -45,12 +45,26 @@ const getPostQuery = `
             id
             title
             text
-            createdAt
-            updatedAt
             imgName
             user {
                 username
                 email
+            }
+        }
+    }
+`
+
+const getPostsQuery = `
+    query getPosts($pagination: PaginationInput!){
+        getPosts(paginationInput: $pagination){
+            posts {
+                id
+                title
+                text 
+                imgName
+                createdAt
+                updatedAt
+                userId
             }
         }
     }
@@ -62,11 +76,17 @@ const deletePostMutation = `
     }
 `
 
+const likeDislikePostMutation = `
+    mutation($id: Int!) {
+        likePostToggle(id: $id)
+    }
+`
+
 let user: User;
 let authToken: string;
 let post: Post;  
 
-describe('Create Post', () => {
+describe('Post CRUD + Like Post', () => {
 
     beforeAll(async () => {
         user = await User.create(getUserObj()).save(); 
@@ -154,6 +174,7 @@ describe('Create Post', () => {
                     title: post.title,
                     text: post.text,
                     imgName: post.imgName,
+                   
                     user: {
                         username: user.username,
                         email: user.email
@@ -162,6 +183,83 @@ describe('Create Post', () => {
             }
         });
     });
+
+    it('reads posts', async () => {
+        const post1Promise = Post.create({...getPostInput(), userId: user.id}).save();
+        const post2Promise = Post.create({...getPostInput(), userId: user.id}).save();
+        const post3Promise = Post.create({...getPostInput(), userId: user.id}).save(); 
+
+        const  posts = await Promise.all([post1Promise, post2Promise, post3Promise]); 
+
+        const updatedPosts = posts.map(post => {
+            return {...post, createdAt: post.createdAt.toISOString(), updatedAt: post.updatedAt.toISOString() }; 
+        }); 
+
+        const response = await graphqlCall({
+            source: getPostsQuery, 
+            variableValues: {
+                pagination: {
+                    page: 1, 
+                    limit: 5
+                }
+            },
+            authToken: `Bearer ${authToken}`   
+        });
+
+        expect(response.data.getPosts.posts[2]).toMatchObject(updatedPosts[0]); 
+        expect(response.data.getPosts.posts[1]).toMatchObject(updatedPosts[1]); 
+        expect(response.data.getPosts.posts[0]).toMatchObject(updatedPosts[2]); 
+
+    })
+
+    it('likes and dislikes a post', async () => {
+        post = await Post.findOne({userId: user.id});
+
+        let response = await graphqlCall({
+            source: likeDislikePostMutation, 
+            variableValues: {
+                id: post.id
+            },
+            authToken: `Bearer ${authToken}`   
+        });
+
+        expect(response).toMatchObject({
+            data: {
+                likePostToggle: true
+            }
+        });
+
+        
+        let posts = await  Post.find({
+            where: {id: post.id},
+            relations: ['likes']
+        });   
+
+        expect(posts[0].likes.length).toBe(1); 
+        
+
+        response = await graphqlCall({
+            source: likeDislikePostMutation, 
+            variableValues: {
+                id: post.id
+            },
+            authToken: `Bearer ${authToken}`   
+        });
+
+        expect(response).toMatchObject({
+            data: {
+                likePostToggle: true
+            }
+        });
+
+        posts = await  Post.find({
+            where: {id: post.id},
+            relations: ['likes']
+        });   
+
+        expect(posts[0].likes.length).toBe(0); 
+    
+    }); 
 
     it('deletes a post', async () => {
         post = await Post.findOne({userId: user.id})
@@ -182,7 +280,8 @@ describe('Create Post', () => {
 
         const delPost = await Post.findOne({id: post.id})
         expect(delPost).not.toBeDefined(); 
-    })
+    }); 
+
 });
 
 

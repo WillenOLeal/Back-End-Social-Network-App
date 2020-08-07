@@ -1,4 +1,4 @@
-import { IsEmail, MinLength} from 'class-validator';
+import { IsEmail, MinLength, Max} from 'class-validator';
 import {Field, InputType, Int} from'type-graphql'; 
 
 
@@ -50,9 +50,13 @@ export class PostUpdateInput {
 
 @InputType()
 export class PaginationInput {
+
     @Field(() => Int)
     page: number;
 
     @Field(() => Int)
+    @Max(30, {
+        message: "The limit must be under 30"
+    })
     limit: number
 }

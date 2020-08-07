@@ -146,7 +146,7 @@ export class PostResolver {
     @Mutation(() => Boolean)
     @UseMiddleware(isAuth)
     async likePostToggle(
-        @Arg('id') id: number,
+        @Arg('id', () => Int) id: number,
         @Ctx() {payload}: MyContext
     ){
 

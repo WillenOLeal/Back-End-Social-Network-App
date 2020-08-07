@@ -1,5 +1,5 @@
 import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, JoinColumn,  OneToOne, BaseEntity} from "typeorm";
-import { ObjectType, Field, Int, ID} from "type-graphql";
+import { ObjectType, Field, Int} from "type-graphql";
 import {Post} from './Post'; 
 import {Profile} from './Profile'; 
 import { Comment } from "./Comment";
@@ -9,7 +9,7 @@ import { Comment } from "./Comment";
 @Entity()
 export class User extends BaseEntity{
 
-    @Field(() => ID)
+    @Field(() => Int)
     @PrimaryGeneratedColumn()
     id: number;
 

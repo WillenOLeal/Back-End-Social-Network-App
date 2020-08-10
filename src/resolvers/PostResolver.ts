@@ -1,8 +1,6 @@
-import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Subscription, UseMiddleware, Ctx, PubSub, Int} from'type-graphql'; 
-import { PubSubEngine } from "graphql-subscriptions";
-import { createWriteStream } from 'fs';
+import {Resolver, Mutation, Query, Arg, FieldResolver, Root, UseMiddleware, Ctx, PubSub, Int} from'type-graphql'; 
 import {v4 as uuidv4} from 'uuid'; 
-import {getConnection, Any, In, AdvancedConsoleLogger} from 'typeorm'; 
+import {getConnection, In} from 'typeorm'; 
 import {GraphQLUpload, FileUpload} from 'graphql-upload'; 
 import {Post} from '../entity/Post'; 
 import {User} from '../entity/User';
@@ -10,9 +8,9 @@ import {PostInput, PostUpdateInput} from './types/InputTypes';
 import {isAuth} from './middlewares/isAuth'; 
 import { MyContext } from './types/MyContext';
 import {uploadResponse, getPostsResponse} from './types/OutputTypes';
-import {deletePostImg} from './utils/fileManagement'; 
 import {PaginationInput} from './types/InputTypes';
 import { Friendship } from '../entity/Friendship';
+import { uploadToS3FromStream, deleteImgFromS3 } from './utils/aws-utils';
 
 
 const getPostImgAndDelete = async (postId: number, userId: number) => {
@@ -25,8 +23,8 @@ const getPostImgAndDelete = async (postId: number, userId: number) => {
     .where("post.id = :id AND post.userId = :userId", { id:  postId, userId: userId})
     .getOne();
 
-    if(post) deletePostImg(post.imgName); 
-}
+    if(post) deleteImgFromS3(post.imgName, 'posts'); 
+}; 
 
 const getFriendIds = async (userId: number) => {
 
@@ -79,21 +77,31 @@ export class PostResolver {
     async postImageUpload(@Arg("file", () => GraphQLUpload)
     {
       createReadStream,
-      filename
+      filename,
+      mimetype
     }: FileUpload): Promise<uploadResponse> {
       const fileUniqueName = `${uuidv4()}_${filename}`
+      const {writeSream, promise} = uploadToS3FromStream(fileUniqueName, mimetype, 'posts')
       return new Promise(async (resolve, reject) =>
         createReadStream()
-          .pipe(createWriteStream(__dirname + `/../images/posts/${fileUniqueName}`))
-          .on("finish", () => resolve({
-              imgName: fileUniqueName,
-              uploaded: true
-          }))
-          .on("error", (err) => reject({
-            imgName: "",
-            uploaded: false
-        }))
-      );
+            .pipe(writeSream)
+            .on("finish", async () => {
+                try {
+                    await promise
+                    return resolve({
+                        imgName: fileUniqueName,
+                        uploaded: true
+                    })
+                }
+                catch(err){
+                    console.log(err); 
+                    return reject({
+                        imgName: "",
+                        uploaded: false
+                    })
+                } 
+            })
+        );
     }
 
    @Mutation(() => Post)
@@ -252,5 +260,4 @@ export class PostResolver {
         }
     }
 }
-
 

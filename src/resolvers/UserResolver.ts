@@ -7,11 +7,11 @@ import {v4 as uuidv4} from 'uuid';
 import { createWriteStream } from 'fs';
 import {User} from '../entity/User'; 
 import { Profile } from '../entity/Profile';
-import {deleteProfilePicture} from './utils/fileManagement'
 import {isAuth} from './middlewares/isAuth'; 
 import {MyContext} from './types/MyContext'; 
 import {Friendship} from '../entity/Friendship'; 
 import { SenderPlusReceiverId } from "./types/varTypes";
+import { uploadToS3FromStream, deleteImgFromS3 } from './utils/aws-utils';
 
 const friendReq = 'FRIEND_REQ'; 
 
@@ -25,7 +25,7 @@ const getProfilePictureAndDelete = async (profileId: number) => {
     .where("profile.id = :id" , { id:  profileId})
     .getOne();
 
-    if(profile) deleteProfilePicture(profile.pictureName); 
+    if(profile) deleteImgFromS3(profile.pictureName, 'profiles'); 
 }
 
 @Resolver(User)
@@ -43,19 +43,27 @@ export class UserResolver {
         @Ctx() {payload}: MyContext,
     {
       createReadStream,
-      filename
+      filename,
+      mimetype
     }: FileUpload): Promise<Boolean>  {
       const fileUniqueName = `${uuidv4()}_${filename}`
+      const {writeSream, promise} = uploadToS3FromStream(fileUniqueName, mimetype, 'profiles'); 
       return new Promise(async (resolve, reject) =>
         createReadStream()
-          .pipe(createWriteStream(__dirname + `/../images/profiles/${fileUniqueName}`))
+          .pipe(writeSream)
           .on("finish", async () => {
-                const profile = await Profile.findOne({userId: payload.userId});
-                getProfilePictureAndDelete(profile.id);
-                await Profile.update({id: profile.id}, {pictureName: fileUniqueName }); 
-                resolve(true)
+                try{
+                  await promise; 
+                  const profile = await Profile.findOne({userId: payload.userId});
+                  getProfilePictureAndDelete(profile.id);
+                  await Profile.update({id: profile.id}, {pictureName: fileUniqueName }); 
+                  return resolve(true)
+                }
+                catch(err){
+                  return resolve(false);
+                }
             })
-          .on("error", (err) => reject(false))
+          .on("error", () => reject(false))
       );
     }
 

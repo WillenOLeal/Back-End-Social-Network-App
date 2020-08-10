@@ -3,6 +3,7 @@
    "version": "0.0.1",
    "description": "Awesome project developed with TypeORM.",
    "devDependencies": {
+      "@types/aws-sdk": "^2.7.0",
       "@types/bcrypt": "^3.0.0",
       "@types/cookie-parser": "^1.4.2",
       "@types/express": "^4.17.6",
@@ -26,6 +27,7 @@
    },
    "dependencies": {
       "apollo-server-express": "^2.14.3",
+      "aws-sdk": "^2.729.0",
       "bcrypt": "^5.0.0",
       "cookie-parser": "^1.4.5",
       "dataloader": "^2.0.0",
@@ -50,11 +52,10 @@
       "typeorm-migration-revert": "ts-node ./node_modules/typeorm/cli.js migration:revert",
       "db:setup": "ts-node ./src/test-utils/dbSetup.ts",
       "test": "yarn run db:setup && jest --forceExit --detectOpenHandles"
-   }, 
-
+   },
    "husky": {
       "hooks": {
-        "pre-commit": "yarn run test"
+         "pre-commit": "yarn run test"
       }
-    }
+   }
 }

@@ -18,7 +18,7 @@ export const getAuthToken = (user: User) => {
         authToken: sign({
             userId: user.id
         },process.env.AUTH_SECRET, {
-            expiresIn: '15m'
+            expiresIn: '2h'
         })
     }; 
 }

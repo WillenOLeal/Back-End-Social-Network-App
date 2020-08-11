@@ -3,6 +3,14 @@ module.exports = {
    "url": process.env.DATABASE_URL,
    "synchronize": true,
    "logging": true,
+   "cache": {
+      type: "redis", 
+      duration: 10000,
+      options: {
+         host: process.env.REDIS_HOST,
+         port: parseInt(process.env.REDIS_PORT)
+      }
+   },
    "entities": [
       "src/entity/**/*.ts"
    ],

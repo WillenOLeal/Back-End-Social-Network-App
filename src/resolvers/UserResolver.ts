@@ -4,7 +4,6 @@ import { getRepository } from 'typeorm';
 import {GraphQLUpload, FileUpload} from 'graphql-upload'; 
 import {getConnection} from 'typeorm'; 
 import {v4 as uuidv4} from 'uuid'; 
-import { createWriteStream } from 'fs';
 import {User} from '../entity/User'; 
 import { Profile } from '../entity/Profile';
 import {isAuth} from './middlewares/isAuth'; 
@@ -120,7 +119,10 @@ export class UserResolver {
 
       if(friendship) {
         const result = await Friendship.update({senderId: userId, receiverId: payload.userId, status: 0}, {status: 1})
-        if (result.affected > 0) return true;
+        if (result.affected > 0) {
+          getConnection().queryResultCache.remove([`${payload.userId}-getFriendsQuery`]); 
+          return true;
+        }
       }
 
       return false; 

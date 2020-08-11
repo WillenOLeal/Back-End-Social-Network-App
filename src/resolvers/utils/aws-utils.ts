@@ -8,7 +8,6 @@ export const deleteImgFromS3 = async (filename: string, folderName: string) => {
         Key: `${folderName}/${filename}`,
     };
 
-    console.log(`${folderName}/${filename}`); 
     const s3 = new S3(); 
     s3.deleteObject(params).promise(); 
 }

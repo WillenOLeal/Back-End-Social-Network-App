@@ -70,7 +70,6 @@ export class CommentResolver {
         .where('comment.id = :id', {id: id})
         .getOne(); 
 
-        console.log(comment)
         if(!comment) return false
 
         const user = await User.findOne({where: {id: payload.userId}}); 

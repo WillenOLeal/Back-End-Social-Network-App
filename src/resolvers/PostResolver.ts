@@ -36,6 +36,7 @@ const getFriendIds = async (userId: number) => {
     .select(['friendship.senderId', 'friendship.receiverId'])
     .where('friendship.senderId = :id AND friendship.status = :status', {id: userId, status: STATUS})
     .orWhere('friendship.receiverId = :id AND friendship.status = :status', {id: userId, status: STATUS})
+    .cache(`${userId}-getFriendsQuery`)
     .getMany();  
 
     let ids:number[] = []; 
@@ -94,7 +95,6 @@ export class PostResolver {
                     })
                 }
                 catch(err){
-                    console.log(err); 
                     return reject({
                         imgName: "",
                         uploaded: false
@@ -259,5 +259,12 @@ export class PostResolver {
             total: total
         }
     }
+
+    @Query(() => Boolean) 
+    async bye(){
+        await getConnection().queryResultCache.remove(["users_admins"]);
+        return true
+    }
+
 }
 

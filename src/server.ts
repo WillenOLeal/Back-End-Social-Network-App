@@ -2,7 +2,6 @@ import "reflect-metadata";
 import {createConnection} from "typeorm";
 import express from "express"; 
 import http from 'http'; 
-import path from 'path'; 
 import {ApolloServer} from "apollo-server-express" 
 import {graphqlUploadExpress} from 'graphql-upload'; 
 import {refreshToken} from './resolvers/utils/auth'
@@ -12,18 +11,18 @@ import { likesCommentLoader } from "./loaders/likesCommentLoader";
 import { verifyAuthTokenOverWebSocket } from './resolvers/utils/auth';
 import {createSchema} from './utils/createSchema';
 import { getComplexity, fieldExtensionsEstimator, simpleEstimator } from 'graphql-query-complexity'
+import s3Proxy from './resolvers/middlewares/S3Proxy';
 import 'dotenv/config';
-
 
 (async () => {
     const app = express(); 
     await createConnection(); 
     const schema = await createSchema(); 
-
-    app.use('/images/posts', express.static(path.join(__dirname, '/images/posts'))); 
-    app.use('/images/profiles', express.static(path.join(__dirname, '/images/profiles'))); 
+    
+    app.use('/media/', s3Proxy); 
     app.use(cookieParser()); 
     app.post('/refresh-token', refreshToken); 
+
 
     app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
 

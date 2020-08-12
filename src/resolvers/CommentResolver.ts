@@ -1,11 +1,11 @@
-import {Resolver, Mutation, Query, Arg, FieldResolver, Root, UseMiddleware, Ctx} from'type-graphql'; 
+import {Resolver, Mutation, Query, Arg, FieldResolver, Root, UseMiddleware, Ctx, Int} from'type-graphql'; 
 import {getConnection, Any} from 'typeorm'; 
 import {Post} from '../entity/Post'; 
 import {isAuth} from './middlewares/isAuth'; 
 import { MyContext } from './types/MyContext';
 import { Comment } from '../entity/Comment';
 import {User} from '../entity/User'; 
-import {PaginationInput, PostUpdateInput} from './types/InputTypes'
+import {PaginationInput} from './types/InputTypes'
 import { getCommentsResponse } from './types/OutputTypes';
 
 @Resolver(Comment)
@@ -28,7 +28,7 @@ export class CommentResolver {
    @Mutation(() => Comment, {nullable: true})
    @UseMiddleware(isAuth)
    async createComment(
-       @Arg('postId') postId: number, 
+       @Arg('postId', () => Int) postId: number, 
        @Arg('text') text: string, 
        @Ctx() {payload}: MyContext
    ) {
@@ -47,7 +47,7 @@ export class CommentResolver {
    @Mutation(() => Boolean)
    @UseMiddleware(isAuth)
    async deleteComment(
-       @Arg('id') id: number,
+       @Arg('id', () => Int) id: number,
        @Ctx() {payload}: MyContext
     ){
         const result = await Comment.delete({id: id, userId: payload.userId});
@@ -58,7 +58,7 @@ export class CommentResolver {
     @Mutation(() => Boolean)
     @UseMiddleware(isAuth)
     async likeCommentToggle(
-        @Arg('id') id: number,
+        @Arg('id', () => Int) id: number,
         @Ctx() {payload}: MyContext
     ){
 
@@ -97,7 +97,7 @@ export class CommentResolver {
     @Query(() => getCommentsResponse)
     @UseMiddleware(isAuth)
     async getComments(
-        @Arg('postId') postId: number, 
+        @Arg('postId', () => Int) postId: number, 
         @Arg('paginationInput')  {page, limit}: PaginationInput
     ){
         const take = limit || 10; 

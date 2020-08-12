@@ -1,4 +1,4 @@
-import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Subscription, Ctx, UseMiddleware, PubSub} from'type-graphql';
+import {Resolver, Mutation, Query, Arg, FieldResolver, Root, Subscription, Ctx, UseMiddleware, PubSub, Int} from'type-graphql';
 import { PubSubEngine } from 'graphql-subscriptions';
 import { getRepository } from 'typeorm'; 
 import {GraphQLUpload, FileUpload} from 'graphql-upload'; 
@@ -11,6 +11,7 @@ import {MyContext} from './types/MyContext';
 import {Friendship} from '../entity/Friendship'; 
 import { SenderPlusReceiverId } from "./types/varTypes";
 import { uploadToS3FromStream, deleteImgFromS3 } from './utils/aws-utils';
+import {PaginationInput} from './types/InputTypes';
 
 const friendReq = 'FRIEND_REQ'; 
 
@@ -82,7 +83,7 @@ export class UserResolver {
    @UseMiddleware(isAuth)
    async addFriend(
      @PubSub() pubSub: PubSubEngine,
-     @Arg('useerId') userId: number,
+     @Arg('useerId', () => Int) userId: number,
      @Ctx() {payload}: MyContext
    ){
     
@@ -111,7 +112,7 @@ export class UserResolver {
    @Mutation(() => Boolean)
    @UseMiddleware(isAuth)
    async confirmFriendRequest(
-     @Arg('userId') userId: number, 
+     @Arg('userId', () => Int) userId: number, 
      @Ctx() {payload}: MyContext
    ){
       if(payload.userId == userId) return false; 
@@ -128,13 +129,42 @@ export class UserResolver {
       return false; 
    }
 
+   @Mutation(() => Boolean)
+   @UseMiddleware(isAuth)
+   async unfriend(
+     @Arg('userId', () => Int) userId: number, 
+     @Ctx() {payload}: MyContext
+   ){
+      if(payload.userId == userId) return false; 
+      const friendship = await Friendship.findOne({where: [
+        {senderId: payload.userId, receiverId: userId, status: 1},
+        {senderId: userId, receiverId: payload.userId, status: 1}
+      ]})
+
+      if(!friendship) return false; 
+
+      await Friendship.remove(friendship); 
+      return true; 
+   }
+
+
    @Query(() => [User], {nullable: true})
    @UseMiddleware(isAuth)
    async getUsers(
+     @Arg('paginationInput') {page, limit}: PaginationInput, 
      @Arg('username') username: string
-    ){
+   ){
+
+      const take = limit || 10; 
+      let skip = (page -1) * take; 
+      if(page < 0){
+            skip = 0; 
+      } 
+
       const users = await getRepository(User)
       .createQueryBuilder("user")
+      .skip(skip)
+      .take(take)
       .where("user.username like :username", {username: `%${username}%` })
       .getMany();
       

@@ -1,9 +1,9 @@
-import { ObjectType, Field, Int, ID} from "type-graphql";
+import { ObjectType, Field, Int} from "type-graphql";
 
 @ObjectType()
 export class SenderPlusReceiverId {
 
-    @Field(() => ID)
+    @Field(() => Int)
     id: number;
 
     @Field()
@@ -12,9 +12,10 @@ export class SenderPlusReceiverId {
     @Field()
     email: string; 
 
-    @Field(() => String,{nullable: true})
-    createdAt: Date; 
-
     @Field(() => Int)
     receiverId: number; 
+
+    @Field(() => String,{nullable: true})
+    createdAt: Date; 
+    
 }

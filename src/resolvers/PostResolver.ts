@@ -68,10 +68,21 @@ export class PostResolver {
     async likesCount(
         @Root() post: Post,
         @Ctx() {likesPostLoader}: MyContext
-    ) {
-  
+    ){
         return likesPostLoader.load(post.id); 
     }
+
+    @FieldResolver()
+    async hasLiked(
+        @Root() post: Post,
+        @Ctx() {hasLikedPostLoader, payload}: MyContext
+    ){
+        return hasLikedPostLoader.load({
+            id: post.id,
+            userId: payload.userId
+        }); 
+    }
+
 
     @Mutation(() => uploadResponse)
     @UseMiddleware(isAuth)

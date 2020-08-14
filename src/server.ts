@@ -8,6 +8,7 @@ import {refreshToken} from './resolvers/utils/auth'
 import cookieParser from 'cookie-parser';
 import { likesPostLoader } from "./loaders/likesPostLoader";
 import { likesCommentLoader } from "./loaders/likesCommentLoader";
+import { hasLikedPostLoader } from "./loaders/postHasLikedLoader";
 import { verifyAuthTokenOverWebSocket } from './resolvers/utils/auth';
 import {createSchema} from './utils/createSchema';
 import { getComplexity, fieldExtensionsEstimator, simpleEstimator } from 'graphql-query-complexity'
@@ -36,7 +37,8 @@ import 'dotenv/config';
                     req,
                     res,
                     likesPostLoader: likesPostLoader(),
-                    likesCommentLoader: likesCommentLoader()
+                    likesCommentLoader: likesCommentLoader(),
+                    hasLikedPostLoader: hasLikedPostLoader()
                 }
         },
         subscriptions: {
@@ -81,6 +83,6 @@ import 'dotenv/config';
     apolloServer.installSubscriptionHandlers(httpServer);
 
     httpServer.listen(3000, () => {
-        console.log("Listening on port 3000"); 
+        console.log("🚀 Listening on port 3000"); 
     })
 })();

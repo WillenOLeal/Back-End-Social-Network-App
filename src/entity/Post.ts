@@ -42,6 +42,9 @@ export class Post extends BaseEntity {
     @Field(() => Int)
     likesCount: number; 
 
+    @Field(() => Boolean)
+    hasLiked: boolean; 
+
     @Field(() => String)
     @CreateDateColumn({type: "timestamp"})
     createdAt: Date;

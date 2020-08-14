@@ -4,7 +4,6 @@ import { getPostInput, getUserObj } from '../../test-utils/util-functions';
 import { User } from '../../entity/User';
 import { getAuthToken } from '../utils/auth';
 import { Post } from '../../entity/Post';
-import { PostUpdateInput } from '../types/InputTypes';
 
 dbInit(); 
 

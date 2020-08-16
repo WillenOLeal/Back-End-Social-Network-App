@@ -35,11 +35,13 @@ export class Comment extends BaseEntity{
     @JoinTable({name: "likedComment"})
     likes: User[];
 
-    @Field(() => Int)
-    likesCount: number; 
-
     @Field(() => String)
     @CreateDateColumn({type: "timestamp"})
     createdAt: Date; 
 
+    @Field(() => Int)
+    likesCount: number; 
+
+    @Field(() => Boolean)
+    hasLiked: boolean; 
 }

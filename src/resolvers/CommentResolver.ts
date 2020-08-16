@@ -25,6 +25,17 @@ export class CommentResolver {
         return likesCommentLoader.load(comment.id); 
     }
 
+    @FieldResolver()
+    hasLiked(
+        @Root() comment: Comment,
+        @Ctx() {hasLikedCommentLoader, payload}: MyContext
+    ) {
+        return hasLikedCommentLoader.load({
+            id: comment.id, 
+            userId: payload.userId
+        }); 
+    }
+
    @Mutation(() => Comment, {nullable: true})
    @UseMiddleware(isAuth)
    async createComment(

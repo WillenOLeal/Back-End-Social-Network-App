@@ -73,6 +73,15 @@ export class PostResolver {
     }
 
     @FieldResolver()
+    async commentsCount(
+        @Root() post: Post,
+        @Ctx() {commentsPostLoader}: MyContext
+    ){
+        return commentsPostLoader.load(post.id); 
+    }
+
+
+    @FieldResolver()
     async hasLiked(
         @Root() post: Post,
         @Ctx() {hasLikedPostLoader, payload}: MyContext

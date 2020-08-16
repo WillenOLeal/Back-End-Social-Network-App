@@ -39,12 +39,6 @@ export class Post extends BaseEntity {
     @JoinTable({name: "likedPost"})
     likes: User[];
 
-    @Field(() => Int)
-    likesCount: number; 
-
-    @Field(() => Boolean)
-    hasLiked: boolean; 
-
     @Field(() => String)
     @CreateDateColumn({type: "timestamp"})
     createdAt: Date;
@@ -52,5 +46,14 @@ export class Post extends BaseEntity {
     @Field(() => String)
     @UpdateDateColumn({type: "timestamp"})
     updatedAt: Date; 
+
+    @Field(() => Int)
+    likesCount: number; 
+
+    @Field(() => Int)
+    commentsCount: number
+
+    @Field(() => Boolean)
+    hasLiked: boolean; 
 
 }

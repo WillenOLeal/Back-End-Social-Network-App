@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import { likesPostLoader } from "./loaders/likesPostLoader";
 import { likesCommentLoader } from "./loaders/likesCommentLoader";
 import { hasLikedPostLoader } from "./loaders/postHasLikedLoader";
+import { commentsPostLoader } from "./loaders/postCommentsCountLoader";
 import { verifyAuthTokenOverWebSocket } from './resolvers/utils/auth';
 import {createSchema} from './utils/createSchema';
 import { getComplexity, fieldExtensionsEstimator, simpleEstimator } from 'graphql-query-complexity'
@@ -38,7 +39,8 @@ import 'dotenv/config';
                     res,
                     likesPostLoader: likesPostLoader(),
                     likesCommentLoader: likesCommentLoader(),
-                    hasLikedPostLoader: hasLikedPostLoader()
+                    hasLikedPostLoader: hasLikedPostLoader(), 
+                    commentsPostLoader: commentsPostLoader()
                 }
         },
         subscriptions: {
@@ -48,6 +50,7 @@ import 'dotenv/config';
             }
         },
         uploads: false, 
+        tracing: true, 
         plugins: [
             {
                 requestDidStart: () => ({

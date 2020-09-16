@@ -1,1 +1,1 @@
-declare module "s3proxy"; 
+declare module "s3proxy";

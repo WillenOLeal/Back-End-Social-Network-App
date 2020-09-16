@@ -147,10 +147,13 @@ export class UserResolver {
         { status: 1 }
       );
       if (result.affected > 0) {
-        getConnection().queryResultCache.remove([
-          `${payload.userId}-getFriendsQuery`,
-        ]);
-        return true;
+        try {
+          getConnection().queryResultCache.remove([
+            `${payload.userId}-getFriendsQuery`,
+          ]);
+        } finally {
+          return true;
+        }
       }
     }
 
